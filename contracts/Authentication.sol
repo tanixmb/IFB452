@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./IGarmentRegistry.sol";
+
 contract Authentication {
     address public owner;
+    IGarmentRegistry public garmentRegistry;
 
     struct AuthenticationCheck {
         uint256 garmentId;
@@ -11,29 +14,22 @@ contract Authentication {
         uint256 timestamp;
     }
 
-    mapping(uint256 => bool) public verifiedGarments;
     mapping(uint256 => AuthenticationCheck[]) private authenticationHistory;
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Only owner can call this function");
-        _;
-    }
-
-    constructor() {
+    constructor(address _garmentRegistryAddress) {
         owner = msg.sender;
-    }
-
-    function setVerifiedGarment(uint256 _garmentId, bool _isVerified) external onlyOwner {
-        verifiedGarments[_garmentId] = _isVerified;
+        garmentRegistry = IGarmentRegistry(_garmentRegistryAddress);
     }
 
     function checkAuthenticity(uint256 _garmentId) external returns (string memory) {
+        require(garmentRegistry.isGarmentRegistered(_garmentId), "Garment not registered");
+
         string memory result;
 
-        if (verifiedGarments[_garmentId]) {
+        if (garmentRegistry.isGarmentVerified(_garmentId)) {
             result = "Authentic garment";
         } else {
-            result = "Garment not verified";
+            result = "Garment registered but not verified";
         }
 
         authenticationHistory[_garmentId].push(AuthenticationCheck({

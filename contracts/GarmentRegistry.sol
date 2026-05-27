@@ -24,7 +24,7 @@ contract GarmentRegistry {
         _;
     }
 
-    modifier onlyAuthorised() {
+    modifier onlyAuthorisedManufacturer() {
         require(authorisedManufacturers[msg.sender], "Not an authorised manufacturer");
         _;
     }
@@ -33,8 +33,8 @@ contract GarmentRegistry {
         owner = msg.sender;
     }
 
-    function authoriseStakeholder(address _stakeholder, bool _isAuthorised) external onlyOwner {
-        authorisedManufacturers[_stakeholder] = _isAuthorised;
+    function authoriseManufacturer(address _manufacturer, bool _isAuthorised) external onlyOwner {
+        authorisedManufacturers[_manufacturer] = _isAuthorised;
     }
 
     function registerGarment(
@@ -43,7 +43,7 @@ contract GarmentRegistry {
         string memory _description,
         string memory _material,
         uint256 _manufacturingYear
-    ) external onlyAuthorised {
+    ) external onlyAuthorisedManufacturer {
         require(!garments[_id].isRegistered, "Garment already registered");
 
         garments[_id] = Garment({
@@ -60,13 +60,21 @@ contract GarmentRegistry {
         totalGarments++;
     }
 
+    function verifyGarment(uint256 _id) external onlyOwner {
+        require(garments[_id].isRegistered, "Garment not registered");
+        garments[_id].isVerified = true;
+    }
+
     function getGarment(uint256 _id) external view returns (Garment memory) {
         require(garments[_id].isRegistered, "Garment not registered");
         return garments[_id];
     }
 
-    function verifyGarment(uint256 _id) external onlyOwner {
-        require(garments[_id].isRegistered, "Garment not registered");
-        garments[_id].isVerified = true;
+    function isGarmentRegistered(uint256 _id) external view returns (bool) {
+        return garments[_id].isRegistered;
+    }
+
+    function isGarmentVerified(uint256 _id) external view returns (bool) {
+        return garments[_id].isVerified;
     }
 }

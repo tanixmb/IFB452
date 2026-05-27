@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fashion Supply Chain - IFB452</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    h1 {
+      color: #333;
+      border-bottom: 2px solid #333;
+      padding-bottom: 10px;
+    }
+
+    h2 {
+      color: #555;
+      font-size: 16px;
+      margin-top: 0;
+    }
+
+    .section {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 4px;
+      margin-top: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #666;
+    }
+
+    button {
+      background-color: #333;
+      color: white;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+
+    button:hover {
+      background-color: #555;
+    }
+
+    button.secondary {
+      background-color: white;
+      color: #333;
+      border: 1px solid #ccc;
+      margin-left: 8px;
+    }
+
+    button.secondary:hover {
+      background-color: #f0f0f0;
+    }
+
+    button.danger {
+      background-color: #c0392b;
+    }
+
+    button.danger:hover {
+      background-color: #e74c3c;
+    }
+
+    .result {
+      margin-top: 12px;
+      padding: 10px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #444;
+      white-space: pre-wrap;
+      word-break: break-all;
+      min-height: 36px;
+    }
+
+    .result.success {
+      background: #eafaf1;
+      border-color: #27ae60;
+      color: #1e8449;
+    }
+
+    .result.error {
+      background: #fdedec;
+      border-color: #e74c3c;
+      color: #c0392b;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .status-bar {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 4px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #856404;
+    }
+
+    .status-bar.connected {
+      background: #d4edda;
+      border-color: #28a745;
+      color: #155724;
+    }
+
+    .fail-box {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 12px;
+      cursor: pointer;
+    }
+
+    .fail-box:hover {
+      border-color: #c0392b;
+      background: #fdedec;
+    }
+
+    .fail-box h3 {
+      font-size: 13px;
+      color: #c0392b;
+      margin: 0 0 4px 0;
+    }
+
+    .fail-box p {
+      font-size: 11px;
+      color: #777;
+      margin: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+
+    td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #eee;
+    }
+
+    td:first-child {
+      color: #888;
+      width: 130px;
+    }
+
+    #qr-section {
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    #qr-canvas {
+      margin-top: 12px;
+    }
+
+    ul#history-list {
+      list-style: none;
+      padding: 0;
+      margin: 8px 0 0 0;
+      font-size: 12px;
+    }
+
+    ul#history-list li {
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+      color: #555;
+    }
+
+    p.note {
+      font-size: 12px;
+      color: #888;
+      margin: 6px 0 0 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Fashion Supply Chain Tracker</h1>
+  <p style="color:#777; font-size:13px; margin-top:-8px;">IFB452 Blockchain Technology — Group 77</p>
+
+  <!-- STATUS -->
+  <div class="status-bar" id="status-bar">Not connected — fill in contract addresses and click Connect</div>
+
+  <!-- CONNECT -->
+  <div class="section">
+    <h2>Connect to Ganache</h2>
+    <div class="two-col">
+      <div>
+        <label>GarmentRegistry address</label>
+        <input id="addr-registry" placeholder="0x..." />
+      </div>
+      <div>
+        <label>SupplyChainTracker address</label>
+        <input id="addr-tracker" placeholder="0x..." />
+      </div>
+      <div>
+        <label>OwnershipTransfer address</label>
+        <input id="addr-ownership" placeholder="0x..." />
+      </div>
+      <div>
+        <label>Authentication address</label>
+        <input id="addr-auth" placeholder="0x..." />
+      </div>
+    </div>
+    <label>Private key (from Ganache account 0)</label>
+    <input id="pk-input" type="password" placeholder="Paste private key here" />
+    <button onclick="connectToGanache()">Connect</button>
+  </div>
+
+  <!-- AUTHORISE -->
+  <div class="section">
+    <h2>Step 1 — Authorise Wallet</h2>
+    <p class="note">This grants your wallet manufacturer, stakeholder and retailer permissions.</p>
+    <label>Wallet address</label>
+    <input id="auth-addr" placeholder="Auto-filled after connect" />
+    <button onclick="authoriseAll()">Authorise</button>
+    <div class="result" id="auth-result">—</div>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="section">
+    <h2>Step 2 — Register Garment</h2>
+    <div class="two-col">
+      <div>
+        <label>Garment ID</label>
+        <input id="reg-id" type="number" value="101" />
+      </div>
+      <div>
+        <label>Manufacturing Year</label>
+        <input id="reg-year" type="number" value="2026" />
+      </div>
+    </div>
+    <label>Name</label>
+    <input id="reg-name" value="Silk Evening Dress" />
+    <label>Description</label>
+    <input id="reg-desc" value="Hand-finished silk gown, limited edition" />
+    <label>Material</label>
+    <input id="reg-material" value="100% Mulberry Silk" />
+    <button onclick="registerGarment()">Register Garment</button>
+    <div class="result" id="reg-result">—</div>
+  </div>
+
+  <!-- SUPPLY UPDATE -->
+  <div class="section">
+    <h2>Step 3 — Add Supply Chain Update</h2>
+    <label>Garment ID</label>
+    <input id="sc-id" type="number" value="101" />
+    <label>Status</label>
+    <input id="sc-status" value="Quality check passed — ready for dispatch" />
+    <label>Location</label>
+    <input id="sc-location" value="Milan Distribution Centre" />
+    <button onclick="addSupplyUpdate()">Add Update</button>
+    <button class="secondary" onclick="getSupplyHistory()">View History</button>
+    <div class="result" id="sc-result">—</div>
+    <ul id="history-list"></ul>
+  </div>
+
+  <!-- VERIFY -->
+  <div class="section">
+    <h2>Step 4 — Verify Garment</h2>
+    <p class="note">Only the contract owner can call this. Sets isVerified = true in GarmentRegistry.</p>
+    <label>Garment ID</label>
+    <input id="verify-id" type="number" value="101" />
+    <button onclick="verifyGarment()">Verify Garment</button>
+    <div class="result" id="verify-result">—</div>
+  </div>
+
+  <!-- TRANSFER -->
+  <div class="section">
+    <h2>Step 5 — Transfer Ownership</h2>
+    <label>Garment ID</label>
+    <input id="ot-id" type="number" value="101" />
+    <label>Customer wallet address</label>
+    <input id="ot-customer" placeholder="Paste any other Ganache address" />
+    <button onclick="transferOwnership()">Transfer Ownership</button>
+    <div class="result" id="ot-result">—</div>
+  </div>
+
+  <!-- AUTHENTICATE -->
+  <div class="section">
+    <h2>Step 6 — Check Authenticity</h2>
+    <label>Garment ID</label>
+    <input id="check-id" type="number" value="101" />
+    <button onclick="checkAuthenticity()">Check Authenticity</button>
+    <button class="secondary" onclick="loadGarmentCard()">View Garment Record</button>
+    <div class="result" id="check-result">—</div>
+    <table id="garment-table" style="display:none;"></table>
+  </div>
+
+  <!-- QR -->
+  <div class="section">
+    <h2>Step 7 — Generate QR Code</h2>
+    <label>Garment ID</label>
+    <input id="qr-id" type="number" value="101" />
+    <button onclick="generateQR()">Generate QR</button>
+    <div id="qr-section" style="display:none;">
+      <canvas id="qr-canvas"></canvas>
+      <p style="font-size:12px; color:#777; margin-top:6px;" id="qr-label"></p>
+    </div>
+  </div>
+
+  <!-- FAILURE CASES -->
+  <div class="section">
+    <h2>Failure Cases — Revert Demonstration</h2>
+    <p class="note" style="margin-bottom:12px;">These are expected to fail. Each one shows a different require() guard working correctly.</p>
+    <div class="three-col">
+      <div class="fail-box" onclick="testDuplicateRegistration()">
+        <h3>Duplicate Registration</h3>
+        <p>Try to register garment 101 again — should revert with "Garment already registered"</p>
+      </div>
+      <div class="fail-box" onclick="testUnauthorisedUpdate()">
+        <h3>Unauthorised Update</h3>
+        <p>Random wallet tries to add a supply update — should revert with "Not an authorised stakeholder"</p>
+      </div>
+      <div class="fail-box" onclick="testInvalidGarment()">
+        <h3>Invalid Garment ID</h3>
+        <p>Authenticate garment 9999 (doesn't exist) — should revert with "Garment not registered"</p>
+      </div>
+    </div>
+    <div class="result" id="fail-result" style="margin-top:12px;">—</div>
+  </div>
+
+  <p style="text-align:center; color:#aaa; font-size:11px; margin-top:10px;">
+    IFB452 Blockchain Technology — Fashion Supply Chain Tracking & Authentication — Group 77
+  </p>
+
+<script src="app.js"></script>
+</body>
+</html>

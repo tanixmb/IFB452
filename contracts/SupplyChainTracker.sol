@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./IGarmentRegistry.sol";
+
 contract SupplyChainTracker {
     address public owner;
+    IGarmentRegistry public garmentRegistry;
 
     struct SupplyUpdate {
         uint256 garmentId;
@@ -20,13 +23,14 @@ contract SupplyChainTracker {
         _;
     }
 
-    modifier onlyAuthorised() {
+    modifier onlyAuthorisedStakeholder() {
         require(authorisedStakeholders[msg.sender], "Not an authorised stakeholder");
         _;
     }
 
-    constructor() {
+    constructor(address _garmentRegistryAddress) {
         owner = msg.sender;
+        garmentRegistry = IGarmentRegistry(_garmentRegistryAddress);
     }
 
     function authoriseStakeholder(address _stakeholder, bool _isAuthorised) external onlyOwner {
@@ -37,7 +41,9 @@ contract SupplyChainTracker {
         uint256 _garmentId,
         string memory _status,
         string memory _location
-    ) external onlyAuthorised {
+    ) external onlyAuthorisedStakeholder {
+        require(garmentRegistry.isGarmentRegistered(_garmentId), "Garment not registered");
+
         garmentHistory[_garmentId].push(SupplyUpdate({
             garmentId: _garmentId,
             status: _status,

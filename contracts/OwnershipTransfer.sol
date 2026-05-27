@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./IGarmentRegistry.sol";
+
 contract OwnershipTransfer {
     address public owner;
+    IGarmentRegistry public garmentRegistry;
 
     struct OwnershipRecord {
         uint256 garmentId;
@@ -25,8 +28,9 @@ contract OwnershipTransfer {
         _;
     }
 
-    constructor() {
+    constructor(address _garmentRegistryAddress) {
         owner = msg.sender;
+        garmentRegistry = IGarmentRegistry(_garmentRegistryAddress);
     }
 
     function authoriseRetailer(address _retailer, bool _isAuthorised) external onlyOwner {
@@ -34,10 +38,10 @@ contract OwnershipTransfer {
     }
 
     function transferOwnership(uint256 _garmentId, address _customer) external onlyRetailer {
+        require(garmentRegistry.isGarmentRegistered(_garmentId), "Garment not registered");
         require(_customer != address(0), "Invalid customer address");
 
         address previous = currentOwner[_garmentId];
-
         currentOwner[_garmentId] = _customer;
 
         ownershipHistory[_garmentId].push(OwnershipRecord({
