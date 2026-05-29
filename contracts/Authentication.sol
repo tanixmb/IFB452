@@ -4,23 +4,27 @@ pragma solidity ^0.8.0;
 import "./IGarmentRegistry.sol";
 
 contract Authentication {
+
     address public owner;
-    IGarmentRegistry public garmentRegistry;
+    IGarmentRegistry public garmentRegistry; // connects to GarmentRegistry via interface
 
     struct AuthenticationCheck {
         uint256 garmentId;
         address checkedBy;
-        string result;
+        string result; // "Authentic garment" or "Garment registered but not verified"
         uint256 timestamp;
     }
 
-    mapping(uint256 => AuthenticationCheck[]) private authenticationHistory;
+    mapping(uint256 => AuthenticationCheck[]) private authenticationHistory; // check history per garment
 
     constructor(address _garmentRegistryAddress) {
         owner = msg.sender;
         garmentRegistry = IGarmentRegistry(_garmentRegistryAddress);
     }
 
+    // checks if a garment is authentic and records the result
+    // calls isGarmentRegistered first — reverts if garment doesn't exist
+    // calls isGarmentVerified to determine the result
     function checkAuthenticity(uint256 _garmentId) external returns (string memory) {
         require(garmentRegistry.isGarmentRegistered(_garmentId), "Garment not registered");
 

@@ -7,364 +7,452 @@
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      min-height: 100vh;
+      transition: background 0.4s;
+    }
+
+    /* ── ROLE THEMES ── */
+    body.theme-admin        { background: #f0f0f0; }
+    body.theme-manufacturer { background: #eaf3fb; }
+    body.theme-stakeholder  { background: #eafaf1; }
+    body.theme-retailer     { background: #fef9ec; }
+    body.theme-customer     { background: #f5eef8; }
+
+    /* ── HEADER ── */
+    .header {
+      padding: 0;
+      margin-bottom: 0;
+      transition: background 0.4s;
+    }
+
+    .header-inner {
       max-width: 900px;
       margin: 0 auto;
-      padding: 20px;
-      background-color: #f5f5f5;
+      padding: 24px 20px 20px;
     }
 
-    h1 {
-      color: #333;
-      border-bottom: 2px solid #333;
-      padding-bottom: 10px;
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
-    h2 {
-      color: #555;
-      font-size: 16px;
-      margin-top: 0;
+    .header h1 {
+      font-size: 22px;
+      color: white;
+      margin-bottom: 4px;
     }
 
-    .section {
+    .header p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.75);
+    }
+
+    .role-switcher select {
+      padding: 7px 12px;
+      border-radius: 4px;
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      outline: none;
+    }
+
+    .role-switcher select option { color: #333; background: white; }
+
+    .role-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* header colours per role */
+    .header.admin        { background: #2c3e50; }
+    .header.manufacturer { background: #1a5276; }
+    .header.stakeholder  { background: #1d6a3a; }
+    .header.retailer     { background: #784212; }
+    .header.customer     { background: #6c3483; }
+
+    /* ── WALLET BAR ── */
+    .wallet-bar {
+      background: rgba(0,0,0,0.15);
+      padding: 8px 20px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.8);
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .wallet-bar span { display: flex; align-items: center; gap: 5px; }
+
+    /* ── MAIN ── */
+    .main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+    }
+
+    /* ── ROLE INTRO ── */
+    .role-intro {
       background: white;
-      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      border-left: 4px solid #ccc;
+      transition: border-color 0.4s;
+    }
+
+    .role-intro h2 { font-size: 16px; color: #333; margin-bottom: 6px; }
+    .role-intro p  { font-size: 13px; color: #777; line-height: 1.5; }
+
+    .role-intro.admin        { border-left-color: #2c3e50; }
+    .role-intro.manufacturer { border-left-color: #1a5276; }
+    .role-intro.stakeholder  { border-left-color: #1d6a3a; }
+    .role-intro.retailer     { border-left-color: #784212; }
+    .role-intro.customer     { border-left-color: #6c3483; }
+
+    /* ── STATUS ── */
+    .status-bar {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
       border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #856404;
+    }
+    .status-bar.connected { background: #d4edda; border-color: #28a745; color: #155724; }
+
+    /* ── CONNECT ── */
+    .connect-section {
+      background: white;
+      border-radius: 8px;
       padding: 20px;
       margin-bottom: 20px;
     }
 
+    .connect-section h3 { font-size: 14px; color: #333; margin-bottom: 14px; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── SECTIONS ── */
+    .section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+      border-top: 3px solid #ccc;
+      transition: border-color 0.4s;
+    }
+
+    .section.admin        { border-top-color: #2c3e50; }
+    .section.manufacturer { border-top-color: #1a5276; }
+    .section.stakeholder  { border-top-color: #1d6a3a; }
+    .section.retailer     { border-top-color: #784212; }
+    .section.customer     { border-top-color: #6c3483; }
+    .section.danger       { border-top-color: #c0392b; }
+
+    .section h3 { font-size: 15px; color: #333; margin-bottom: 14px; }
+
     label {
       display: block;
-      font-size: 13px;
-      color: #555;
+      font-size: 12px;
+      color: #666;
       margin-bottom: 4px;
       margin-top: 10px;
     }
 
     input {
       width: 100%;
-      padding: 8px;
-      border: 1px solid #ccc;
+      padding: 8px 10px;
+      border: 1px solid #ddd;
       border-radius: 4px;
       font-size: 13px;
       box-sizing: border-box;
     }
 
-    input:focus {
-      outline: none;
-      border-color: #666;
-    }
+    input:focus { outline: none; border-color: #999; }
 
-    button {
-      background-color: #333;
-      color: white;
-      border: none;
-      padding: 9px 18px;
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-block;
+      padding: 9px 20px;
       border-radius: 4px;
-      cursor: pointer;
       font-size: 13px;
-      margin-top: 12px;
+      cursor: pointer;
+      border: none;
+      margin-top: 14px;
+      color: white;
+      transition: opacity 0.2s;
     }
 
-    button:hover {
-      background-color: #555;
-    }
+    .btn:hover { opacity: 0.85; }
+    .btn-ghost { background: white; border: 1px solid #ddd; color: #555; margin-left: 8px; }
+    .btn-ghost:hover { background: #f5f5f5; opacity: 1; }
 
-    button.secondary {
-      background-color: white;
-      color: #333;
-      border: 1px solid #ccc;
-      margin-left: 8px;
-    }
+    .btn.admin        { background: #2c3e50; }
+    .btn.manufacturer { background: #1a5276; }
+    .btn.stakeholder  { background: #1d6a3a; }
+    .btn.retailer     { background: #784212; }
+    .btn.customer     { background: #6c3483; }
+    .btn.danger       { background: #c0392b; }
 
-    button.secondary:hover {
-      background-color: #f0f0f0;
-    }
-
-    button.danger {
-      background-color: #c0392b;
-    }
-
-    button.danger:hover {
-      background-color: #e74c3c;
-    }
-
+    /* ── RESULTS ── */
     .result {
       margin-top: 12px;
-      padding: 10px;
+      padding: 10px 12px;
       background: #f9f9f9;
-      border: 1px solid #ddd;
+      border: 1px solid #eee;
       border-radius: 4px;
       font-size: 12px;
-      color: #444;
+      color: #555;
       white-space: pre-wrap;
       word-break: break-all;
       min-height: 36px;
+      line-height: 1.6;
     }
 
-    .result.success {
-      background: #eafaf1;
-      border-color: #27ae60;
-      color: #1e8449;
-    }
+    .result.success { background: #eafaf1; border-color: #27ae60; color: #1e8449; }
+    .result.error   { background: #fdedec; border-color: #e74c3c; color: #c0392b; }
 
-    .result.error {
-      background: #fdedec;
-      border-color: #e74c3c;
-      color: #c0392b;
-    }
-
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .three-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-    }
-
-    .status-bar {
-      background: #fff3cd;
-      border: 1px solid #ffc107;
-      border-radius: 4px;
-      padding: 10px 14px;
-      margin-bottom: 20px;
-      font-size: 13px;
-      color: #856404;
-    }
-
-    .status-bar.connected {
-      background: #d4edda;
-      border-color: #28a745;
-      color: #155724;
-    }
+    /* ── FAIL BOXES ── */
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 
     .fail-box {
       background: #fff;
       border: 1px solid #ddd;
-      border-radius: 4px;
+      border-radius: 6px;
       padding: 12px;
       cursor: pointer;
+      transition: all 0.2s;
     }
+    .fail-box:hover { border-color: #c0392b; background: #fdedec; }
+    .fail-box h4 { font-size: 12px; color: #c0392b; margin: 0 0 4px 0; }
+    .fail-box p  { font-size: 11px; color: #888; margin: 0; line-height: 1.4; }
 
-    .fail-box:hover {
-      border-color: #c0392b;
-      background: #fdedec;
-    }
+    /* ── TABLE ── */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+    td { padding: 7px 8px; border-bottom: 1px solid #f0f0f0; }
+    td:first-child { color: #999; width: 130px; font-size: 11px; text-transform: uppercase; }
 
-    .fail-box h3 {
-      font-size: 13px;
-      color: #c0392b;
-      margin: 0 0 4px 0;
-    }
+    /* ── QR ── */
+    #qr-section { text-align: center; padding: 14px 0 4px; }
 
-    .fail-box p {
+    ul#history-list { list-style: none; padding: 0; margin: 10px 0 0; font-size: 12px; }
+    ul#history-list li { padding: 7px 0; border-bottom: 1px solid #f0f0f0; color: #666; line-height: 1.5; }
+
+    p.note { font-size: 12px; color: #999; margin-top: 6px; line-height: 1.5; }
+
+    .hidden { display: none !important; }
+
+    .switch-hint {
+      display: inline-block;
+      background: rgba(0,0,0,0.1);
+      color: rgba(255,255,255,0.9);
       font-size: 11px;
-      color: #777;
-      margin: 0;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 12px;
-    }
-
-    td {
-      padding: 6px 8px;
-      border-bottom: 1px solid #eee;
-    }
-
-    td:first-child {
-      color: #888;
-      width: 130px;
-    }
-
-    #qr-section {
-      text-align: center;
-      padding: 10px 0;
-    }
-
-    #qr-canvas {
-      margin-top: 12px;
-    }
-
-    ul#history-list {
-      list-style: none;
-      padding: 0;
-      margin: 8px 0 0 0;
-      font-size: 12px;
-    }
-
-    ul#history-list li {
-      padding: 6px 0;
-      border-bottom: 1px solid #eee;
-      color: #555;
-    }
-
-    p.note {
-      font-size: 12px;
-      color: #888;
-      margin: 6px 0 0 0;
+      padding: 3px 8px;
+      border-radius: 3px;
+      margin-top: 6px;
     }
   </style>
 </head>
-<body>
+<body class="theme-admin">
 
-  <h1>Fashion Supply Chain Tracker</h1>
-  <p style="color:#777; font-size:13px; margin-top:-8px;">IFB452 Blockchain Technology — Group 77</p>
-
-  <!-- STATUS -->
-  <div class="status-bar" id="status-bar">Not connected — fill in contract addresses and click Connect</div>
-
-  <!-- CONNECT -->
-  <div class="section">
-    <h2>Connect to Ganache</h2>
-    <div class="two-col">
-      <div>
-        <label>GarmentRegistry address</label>
-        <input id="addr-registry" placeholder="0x..." />
-      </div>
-      <div>
-        <label>SupplyChainTracker address</label>
-        <input id="addr-tracker" placeholder="0x..." />
-      </div>
-      <div>
-        <label>OwnershipTransfer address</label>
-        <input id="addr-ownership" placeholder="0x..." />
-      </div>
-      <div>
-        <label>Authentication address</label>
-        <input id="addr-auth" placeholder="0x..." />
+  <!-- HEADER -->
+  <div class="header admin" id="header">
+    <div class="header-inner">
+      <div class="header-top">
+        <div>
+          <h1 id="header-title">Admin Dashboard</h1>
+          <p id="header-sub">Fashion Supply Chain — IFB452 · Group 77</p>
+          <div class="switch-hint" id="switch-hint">Switch MetaMask to: Admin (0xB55a97...935C)</div>
+        </div>
+        <div class="role-switcher">
+          <div class="role-label">Viewing as</div>
+          <select id="role-select" onchange="switchRole()">
+            <option value="admin">Admin / Owner</option>
+            <option value="manufacturer">Manufacturer</option>
+            <option value="stakeholder">Stakeholder / Supplier</option>
+            <option value="retailer">Retailer</option>
+            <option value="customer">Customer</option>
+          </select>
+        </div>
       </div>
     </div>
-    <label>Private key (from Ganache account 0)</label>
-    <input id="pk-input" type="password" placeholder="Paste private key here" />
-    <button onclick="connectToGanache()">Connect</button>
-  </div>
-
-  <!-- AUTHORISE -->
-  <div class="section">
-    <h2>Step 1 — Authorise Wallet</h2>
-    <p class="note">This grants your wallet manufacturer, stakeholder and retailer permissions.</p>
-    <label>Wallet address</label>
-    <input id="auth-addr" placeholder="Auto-filled after connect" />
-    <button onclick="authoriseAll()">Authorise</button>
-    <div class="result" id="auth-result">—</div>
-  </div>
-
-  <!-- REGISTER -->
-  <div class="section">
-    <h2>Step 2 — Register Garment</h2>
-    <div class="two-col">
-      <div>
-        <label>Garment ID</label>
-        <input id="reg-id" type="number" value="101" />
-      </div>
-      <div>
-        <label>Manufacturing Year</label>
-        <input id="reg-year" type="number" value="2026" />
-      </div>
-    </div>
-    <label>Name</label>
-    <input id="reg-name" value="Silk Evening Dress" />
-    <label>Description</label>
-    <input id="reg-desc" value="Hand-finished silk gown, limited edition" />
-    <label>Material</label>
-    <input id="reg-material" value="100% Mulberry Silk" />
-    <button onclick="registerGarment()">Register Garment</button>
-    <div class="result" id="reg-result">—</div>
-  </div>
-
-  <!-- SUPPLY UPDATE -->
-  <div class="section">
-    <h2>Step 3 — Add Supply Chain Update</h2>
-    <label>Garment ID</label>
-    <input id="sc-id" type="number" value="101" />
-    <label>Status</label>
-    <input id="sc-status" value="Quality check passed — ready for dispatch" />
-    <label>Location</label>
-    <input id="sc-location" value="Milan Distribution Centre" />
-    <button onclick="addSupplyUpdate()">Add Update</button>
-    <button class="secondary" onclick="getSupplyHistory()">View History</button>
-    <div class="result" id="sc-result">—</div>
-    <ul id="history-list"></ul>
-  </div>
-
-  <!-- VERIFY -->
-  <div class="section">
-    <h2>Step 4 — Verify Garment</h2>
-    <p class="note">Only the contract owner can call this. Sets isVerified = true in GarmentRegistry.</p>
-    <label>Garment ID</label>
-    <input id="verify-id" type="number" value="101" />
-    <button onclick="verifyGarment()">Verify Garment</button>
-    <div class="result" id="verify-result">—</div>
-  </div>
-
-  <!-- TRANSFER -->
-  <div class="section">
-    <h2>Step 5 — Transfer Ownership</h2>
-    <label>Garment ID</label>
-    <input id="ot-id" type="number" value="101" />
-    <label>Customer wallet address</label>
-    <input id="ot-customer" placeholder="Paste any other Ganache address" />
-    <button onclick="transferOwnership()">Transfer Ownership</button>
-    <div class="result" id="ot-result">—</div>
-  </div>
-
-  <!-- AUTHENTICATE -->
-  <div class="section">
-    <h2>Step 6 — Check Authenticity</h2>
-    <label>Garment ID</label>
-    <input id="check-id" type="number" value="101" />
-    <button onclick="checkAuthenticity()">Check Authenticity</button>
-    <button class="secondary" onclick="loadGarmentCard()">View Garment Record</button>
-    <div class="result" id="check-result">—</div>
-    <table id="garment-table" style="display:none;"></table>
-  </div>
-
-  <!-- QR -->
-  <div class="section">
-    <h2>Step 7 — Generate QR Code</h2>
-    <label>Garment ID</label>
-    <input id="qr-id" type="number" value="101" />
-    <button onclick="generateQR()">Generate QR</button>
-    <div id="qr-section" style="display:none;">
-      <canvas id="qr-canvas"></canvas>
-      <p style="font-size:12px; color:#777; margin-top:6px;" id="qr-label"></p>
+    <div class="wallet-bar" id="wallet-bar">
+      <span>Not connected</span>
     </div>
   </div>
 
-  <!-- FAILURE CASES -->
-  <div class="section">
-    <h2>Failure Cases — Revert Demonstration</h2>
-    <p class="note" style="margin-bottom:12px;">These are expected to fail. Each one shows a different require() guard working correctly.</p>
-    <div class="three-col">
-      <div class="fail-box" onclick="testDuplicateRegistration()">
-        <h3>Duplicate Registration</h3>
-        <p>Try to register garment 101 again — should revert with "Garment already registered"</p>
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="status-bar" id="status-bar">Not connected — fill in contract addresses and click Connect</div>
+
+    <!-- CONNECT -->
+    <div class="connect-section" id="connect-section">
+      <h3>Connect to Ganache via MetaMask</h3>
+      <div class="two-col">
+        <div>
+          <label>GarmentRegistry address</label>
+          <input id="addr-registry" value="0xA029133dEe6360b2E0956CBDe24FC637F49fFD7B" />
+        </div>
+        <div>
+          <label>SupplyChainTracker address</label>
+          <input id="addr-tracker" value="0xBfaB62fE2Ec9FDD6A157DB7191Ec825963188981" />
+        </div>
+        <div>
+          <label>OwnershipTransfer address</label>
+          <input id="addr-ownership" value="0x9D8A437CEF61c8622d307562F7C89aa95d44EcEc" />
+        </div>
+        <div>
+          <label>Authentication address</label>
+          <input id="addr-auth" value="0xCaB3668350385fB5ba748cb34aB3e024688B867a" />
+        </div>
       </div>
-      <div class="fail-box" onclick="testUnauthorisedUpdate()">
-        <h3>Unauthorised Update</h3>
-        <p>Random wallet tries to add a supply update — should revert with "Not an authorised stakeholder"</p>
+      <button class="btn admin" id="connect-btn" onclick="connectMetaMask()">Connect with MetaMask</button>
+    </div>
+
+    <!-- ROLE INTRO -->
+    <div class="role-intro admin" id="role-intro">
+      <h2 id="intro-title">Welcome, Admin</h2>
+      <p id="intro-desc">You are the contract owner. You can authorise manufacturers, stakeholders and retailers, and verify garments once they have been registered.</p>
+    </div>
+
+    <!-- ADMIN: AUTHORISE -->
+    <div class="section admin" id="section-authorise">
+      <h3>Authorise Stakeholder Wallets</h3>
+      <p class="note">As admin you control who can interact with each contract. Authorise each wallet address below.</p>
+      <label>Manufacturer address</label>
+      <input id="auth-manufacturer" placeholder="0x..." />
+      <label>Stakeholder address</label>
+      <input id="auth-stakeholder" placeholder="0x..." />
+      <label>Retailer address</label>
+      <input id="auth-retailer" placeholder="0x..." />
+      <button class="btn admin" onclick="authoriseAll()">Authorise All Wallets</button>
+      <div class="result" id="auth-result">—</div>
+    </div>
+
+    <!-- ADMIN: VERIFY -->
+    <div class="section admin" id="section-verify">
+      <h3>Verify Garment</h3>
+      <p class="note">Once a manufacturer has registered a garment, you can verify it. This sets isVerified = true in GarmentRegistry and allows the Authentication contract to confirm it as authentic.</p>
+      <label>Garment ID</label>
+      <input id="verify-id" type="number" value="101" />
+      <button class="btn admin" onclick="verifyGarment()">Verify Garment</button>
+      <div class="result" id="verify-result">—</div>
+    </div>
+
+    <!-- MANUFACTURER: REGISTER -->
+    <div class="section manufacturer hidden" id="section-register">
+      <h3>Register New Garment</h3>
+      <p class="note">Register a new garment on the blockchain. Once registered, supply chain stakeholders can begin logging updates.</p>
+      <div class="two-col">
+        <div>
+          <label>Garment ID</label>
+          <input id="reg-id" type="number" value="101" />
+        </div>
+        <div>
+          <label>Manufacturing Year</label>
+          <input id="reg-year" type="number" value="2026" />
+        </div>
       </div>
-      <div class="fail-box" onclick="testInvalidGarment()">
-        <h3>Invalid Garment ID</h3>
-        <p>Authenticate garment 9999 (doesn't exist) — should revert with "Garment not registered"</p>
+      <label>Name</label>
+      <input id="reg-name" value="Silk Evening Dress" />
+      <label>Description</label>
+      <input id="reg-desc" value="Hand-finished silk gown, limited edition" />
+      <label>Material</label>
+      <input id="reg-material" value="100% Mulberry Silk" />
+      <button class="btn manufacturer" onclick="registerGarment()">Register Garment on Blockchain</button>
+      <div class="result" id="reg-result">—</div>
+    </div>
+
+    <!-- STAKEHOLDER: SUPPLY UPDATE -->
+    <div class="section stakeholder hidden" id="section-supply">
+      <h3>Log Supply Chain Update</h3>
+      <p class="note">Log the current status and location of a garment as it moves through the supply chain. Each update is permanently recorded on the blockchain.</p>
+      <label>Garment ID</label>
+      <input id="sc-id" type="number" value="101" />
+      <label>Status</label>
+      <input id="sc-status" value="Quality check passed — ready for dispatch" />
+      <label>Location</label>
+      <input id="sc-location" value="Milan Distribution Centre" />
+      <button class="btn stakeholder" onclick="addSupplyUpdate()">Submit Update</button>
+      <button class="btn-ghost btn" onclick="getSupplyHistory()">View Full History</button>
+      <div class="result" id="sc-result">—</div>
+      <ul id="history-list"></ul>
+    </div>
+
+    <!-- RETAILER: TRANSFER -->
+    <div class="section retailer hidden" id="section-transfer">
+      <h3>Transfer Garment Ownership</h3>
+      <p class="note">When a customer purchases a garment, transfer ownership to their wallet address. This records the sale permanently on the blockchain.</p>
+      <label>Garment ID</label>
+      <input id="ot-id" type="number" value="101" />
+      <label>Customer wallet address</label>
+      <input id="ot-customer" placeholder="0x..." />
+      <button class="btn retailer" onclick="transferOwnership()">Transfer to Customer</button>
+      <div class="result" id="ot-result">—</div>
+    </div>
+
+    <!-- CUSTOMER: AUTHENTICATE -->
+    <div class="section customer hidden" id="section-auth">
+      <h3>Verify Your Garment</h3>
+      <p class="note">Enter the garment ID from your product label to check if your garment is authentic. The result is read directly from the blockchain.</p>
+      <label>Garment ID</label>
+      <input id="check-id" type="number" value="101" />
+      <button class="btn customer" onclick="checkAuthenticity()">Check Authenticity</button>
+      <button class="btn-ghost btn" onclick="loadGarmentCard()">View Full Record</button>
+      <div class="result" id="check-result">—</div>
+      <table id="garment-table" style="display:none;"></table>
+    </div>
+
+    <!-- CUSTOMER: QR -->
+    <div class="section customer hidden" id="section-qr">
+      <h3>Scan QR Code</h3>
+      <p class="note">Generate a verification QR code for this garment. In a real system, this QR would be on the garment label for customers to scan.</p>
+      <label>Garment ID</label>
+      <input id="qr-id" type="number" value="101" />
+      <button class="btn customer" onclick="generateQR()">Generate QR Code</button>
+      <div id="qr-section" style="display:none;">
+        <canvas id="qr-canvas"></canvas>
+        <p style="font-size:12px; color:#999; margin-top:8px;" id="qr-label"></p>
       </div>
     </div>
-    <div class="result" id="fail-result" style="margin-top:12px;">—</div>
-  </div>
 
-  <p style="text-align:center; color:#aaa; font-size:11px; margin-top:10px;">
-    IFB452 Blockchain Technology — Fashion Supply Chain Tracking & Authentication — Group 77
-  </p>
+    <!-- FAILURE CASES — always visible -->
+    <div class="section danger">
+      <h3>Failure Case Demonstrations</h3>
+      <p class="note" style="margin-bottom:14px;">These calls are designed to revert. Each one demonstrates a different require() guard working correctly.</p>
+      <div class="three-col">
+        <div class="fail-box" onclick="testDuplicateRegistration()">
+          <h4>Duplicate Registration</h4>
+          <p>Register garment 101 again — reverts with "Garment already registered"</p>
+        </div>
+        <div class="fail-box" onclick="testUnauthorisedUpdate()">
+          <h4>Unauthorised Update</h4>
+          <p>Random wallet calls addSupplyUpdate — reverts with "Not an authorised stakeholder"</p>
+        </div>
+        <div class="fail-box" onclick="testInvalidGarment()">
+          <h4>Invalid Garment ID</h4>
+          <p>Authenticate garment 9999 — reverts with "Garment not registered"</p>
+        </div>
+      </div>
+      <div class="result" id="fail-result" style="margin-top:12px;">—</div>
+    </div>
+
+  </div>
 
 <script src="app.js"></script>
 </body>

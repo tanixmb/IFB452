@@ -4,8 +4,9 @@ pragma solidity ^0.8.0;
 import "./IGarmentRegistry.sol";
 
 contract SupplyChainTracker {
+
     address public owner;
-    IGarmentRegistry public garmentRegistry;
+    IGarmentRegistry public garmentRegistry; // connects to GarmentRegistry via interface
 
     struct SupplyUpdate {
         uint256 garmentId;
@@ -16,7 +17,7 @@ contract SupplyChainTracker {
     }
 
     mapping(address => bool) public authorisedStakeholders;
-    mapping(uint256 => SupplyUpdate[]) private garmentHistory;
+    mapping(uint256 => SupplyUpdate[]) private garmentHistory; // supply chain history per garment
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
@@ -37,6 +38,7 @@ contract SupplyChainTracker {
         authorisedStakeholders[_stakeholder] = _isAuthorised;
     }
 
+    // checks garment exists via interface before adding update
     function addSupplyUpdate(
         uint256 _garmentId,
         string memory _status,

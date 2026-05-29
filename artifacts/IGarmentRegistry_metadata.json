@@ -1,0 +1,84 @@
+{
+	"compiler": {
+		"version": "0.8.30+commit.73712a01"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_garmentId",
+						"type": "uint256"
+					}
+				],
+				"name": "isGarmentRegistered",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_garmentId",
+						"type": "uint256"
+					}
+				],
+				"name": "isGarmentVerified",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/IGarmentRegistry.sol": "IGarmentRegistry"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/IGarmentRegistry.sol": {
+			"keccak256": "0x0dc482bfce9e57f99ba69c19b7526e7b5738c3797403c239bb4a3765536dd28f",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://92e8f686bce8baf2da6c9ffecdccb8c827941990e3fe211179ff42e931008f31",
+				"dweb:/ipfs/QmPPPgkzubHFnFk1BXLa3mJjJ8pLT3rNgTnfzFGsXjkr3n"
+			]
+		}
+	},
+	"version": 1
+}

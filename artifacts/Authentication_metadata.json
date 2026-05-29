@@ -1,0 +1,175 @@
+{
+	"compiler": {
+		"version": "0.8.30+commit.73712a01"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_garmentRegistryAddress",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_garmentId",
+						"type": "uint256"
+					}
+				],
+				"name": "checkAuthenticity",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "garmentRegistry",
+				"outputs": [
+					{
+						"internalType": "contract IGarmentRegistry",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_garmentId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_index",
+						"type": "uint256"
+					}
+				],
+				"name": "getAuthenticationCheck",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "garmentId",
+								"type": "uint256"
+							},
+							{
+								"internalType": "address",
+								"name": "checkedBy",
+								"type": "address"
+							},
+							{
+								"internalType": "string",
+								"name": "result",
+								"type": "string"
+							},
+							{
+								"internalType": "uint256",
+								"name": "timestamp",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct Authentication.AuthenticationCheck",
+						"name": "",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_garmentId",
+						"type": "uint256"
+					}
+				],
+				"name": "getAuthenticationCheckCount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/Authentication.sol": "Authentication"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/Authentication.sol": {
+			"keccak256": "0x3d0bff6382755e138f0e8f76fc25e0d8080d53ae2c42faab0629000780867a18",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://2c75cf8c1b3f8abe65ebe7cc409b09c16554fe560669050100da496595d81ecb",
+				"dweb:/ipfs/QmSbMthaWsYAozp1vt5GsEkAKxqreeKBxZ8C2R8qB8gKSs"
+			]
+		},
+		"contracts/IGarmentRegistry.sol": {
+			"keccak256": "0x0dc482bfce9e57f99ba69c19b7526e7b5738c3797403c239bb4a3765536dd28f",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://92e8f686bce8baf2da6c9ffecdccb8c827941990e3fe211179ff42e931008f31",
+				"dweb:/ipfs/QmPPPgkzubHFnFk1BXLa3mJjJ8pLT3rNgTnfzFGsXjkr3n"
+			]
+		}
+	},
+	"version": 1
+}

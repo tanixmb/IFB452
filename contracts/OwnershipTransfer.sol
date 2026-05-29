@@ -4,8 +4,9 @@ pragma solidity ^0.8.0;
 import "./IGarmentRegistry.sol";
 
 contract OwnershipTransfer {
+
     address public owner;
-    IGarmentRegistry public garmentRegistry;
+    IGarmentRegistry public garmentRegistry; // connects to GarmentRegistry via interface
 
     struct OwnershipRecord {
         uint256 garmentId;
@@ -15,8 +16,8 @@ contract OwnershipTransfer {
     }
 
     mapping(address => bool) public authorisedRetailers;
-    mapping(uint256 => address) public currentOwner;
-    mapping(uint256 => OwnershipRecord[]) private ownershipHistory;
+    mapping(uint256 => address) public currentOwner; // current owner per garment
+    mapping(uint256 => OwnershipRecord[]) private ownershipHistory; // full transfer history
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
@@ -37,6 +38,7 @@ contract OwnershipTransfer {
         authorisedRetailers[_retailer] = _isAuthorised;
     }
 
+    // checks garment exists via interface before transferring ownership
     function transferOwnership(uint256 _garmentId, address _customer) external onlyRetailer {
         require(garmentRegistry.isGarmentRegistered(_garmentId), "Garment not registered");
         require(_customer != address(0), "Invalid customer address");
